@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>VitaVerse</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/vlibrary/img/vlogo.png" rel="icon">
+  <link href="/vlibrary/img/vlogo.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/vlibrary/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/vlibrary/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="/vlibrary/css/variables.css" rel="stylesheet">
+  
+  <!-- Template Main CSS File -->
+  <link href="/vlibrary/css/main.css" rel="stylesheet">
+
+  <script src="/assets/jquery-3.6.4.min.js"></script>
+	<script>
+	$(document).ready(function () 
+    {
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().split('T')[0];
+        document.getElementById('FeedbackDate').value = formattedDate;
+        $("#M_Contacts").submit(function (event) 
+        {
+            // Call validateForm function before submitting the form
+            if (!validateForm()) {
+                console.log("success");
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+            else
+            {
+                document.getElementById("msg").innerHTML="Your message has been sent. Thank you!";
+            }
+        })
+    });
+
+    function validateForm() 
+    {
+        var Name        = document.getElementById('Name').value;
+        var Email       = parseFloat(document.getElementById('Email').value);
+        var HeaderSub   = parseFloat(document.getElementById('sub').value);
+        var BodyMessage = document.getElementById('bdy').value;
+        
+        if (Name.trim()) {
+            alert('Vitamin Name cannot be empty');
+            return false;
+        }
+        if (!Email.trim()) {
+            alert('Vitamin Name cannot be empty');
+            return false;
+        }
+        if (!HeaderSub.trim()) {
+            alert('Vitamin Name cannot be empty');
+            return false;
+        }
+        if (!BodyMessage.trim()) {
+            alert('Vitamin Name cannot be empty');
+            return false;
+        }
+        // All validations passed
+        return true;
+    }
+
+
+	</script>
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top" data-scrollto-offset="0">
+    <div class="container-fluid d-flex align-items-center justify-content-between">
+
+      <a href="/index" class="logo d-flex align-items-center scrollto me-auto me-lg-0">
+        <img src="/vlibrary/img/vlogo.png" alt="">
+        <h1>VitaVerse<span>.</span></h1>
+      </a>
+
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="/index">Home</a></li>
+          <li><a class="nav-link scrollto" href="/index#about">About VitaVerse</a></li>
+          <li><a class="nav-link scrollto" href="/index#services">Mission and Goals</a></li>
+          <li><a class="nav-link scrollto" class="nav-link scrollto" href="/vitamins">Vitamins</a></li>
+          <li><a class="active"  class="nav-link scrollto" href="/contactform">Contact Us</a></li>
+          <li><a class="nav-link scrollto" href="/signup">Registration</a></li>
+          <li><a class="nav-link scrollto" href="/signin">Login</a></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle d-none"></i>
+      </nav><!-- .navbar -->
+
+      <a class="btn-getstarted scrollto" href="index.html#about">Get Started</a>
+
+    </div>
+  </header><!-- End Header -->
+
+ 
+  <main id="main">
+ 
+    <!-- ======= Contact Section ======= -->
+    <section id="contact" class="contact">
+      <div class="container">
+
+        <div class="section-header">
+          <h2>Contact Us</h2>
+          <p>Do you any query then submit the below contact us form.</p>
+        </div>
+
+      </div>
+
+
+      <div class="container">
+
+        <div class="row gy-5 gx-lg-5">
+
+          <div class="col-lg-4">
+
+            <div class="info" style="display: none;">
+              <h3>Get in touch</h3>
+              <p>Do you any query then submit the below contact us form.</p>
+
+              <div class="info-item d-flex">
+                <i class="bi bi-geo-alt flex-shrink-0"></i>
+                <div>
+                  <h4>Location:</h4>
+                  <p>A108 Adam Street, New York, NY 535022</p>
+                </div>
+              </div>
+
+              <div class="info-item d-flex">
+                <i class="bi bi-envelope flex-shrink-0"></i>
+                <div>
+                  <h4>Email:</h4>
+                  <p>info@example.com</p>
+                </div>
+              </div>
+
+              <div class="info-item d-flex">
+                <i class="bi bi-phone flex-shrink-0"></i>
+                <div>
+                  <h4>Call:</h4>
+                  <p>+1 5589 55488 55</p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="container">
+            <form action="/api/M_Contacts" method="post" role="form" id="M_Contacts">
+              <div class="row">
+                <div class="col-md-6 form-group">
+                  <input type="text"  class="form-control" name="Name" id="Name" placeholder="Your Name" required>
+                </div>
+                <div class="col-md-6 form-group mt-3 mt-md-0">
+                  <input type="email" class="form-control" name="Email" id="Email" placeholder="Your Email" required>
+                </div>
+              </div>
+              <div class="form-group mt-3">
+                <input type="text" class="form-control" name="Title" id="Title" placeholder="Subject" required>
+              </div>
+              <div class="form-group mt-3">
+                <textarea class="form-control" name="Feedback" id="Feedback" placeholder="BodyMessage" required></textarea>
+                    <input type="text" class="form-control" name="FeedbackDate" id="FeedbackDate" style="display: none;">
+                <br>
+                <br>
+                
+                <div class="text-center"><input type="submit" class="btn btn-primary" value="Send Message"></div>
+              </div>
+              <div class="my-3">
+             
+                <div class="sent-message" id="msg"></div>
+              </div>
+            
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+    </section> <!-- End Contact Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+
+
+    <div class="footer-legal text-center">
+      <div class="container d-flex flex-column flex-lg-row justify-content-center justify-content-lg-between align-items-center">
+
+        <div class="d-flex flex-column align-items-center align-items-lg-start">
+          <div class="copyright">
+            2023 &copy; Copyright <strong><span>VitaVerse</span></strong>. All Rights Reserved
+          </div>
+          <div class="credits">
+             Designed by <a href="/index">VitaVerse</a>
+          </div>
+        </div>
+
+     
+
+      </div>
+    </div>
+
+  </footer><!-- End Footer -->
+
+  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="/vlibrary/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/vlibrary/vendor/aos/aos.js"></script>
+  <script src="/vlibrary/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="/vlibrary/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="/vlibrary/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="/vlibrary/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="/vlibrary/js/main.js"></script>
+
+</body>
+
+</html>

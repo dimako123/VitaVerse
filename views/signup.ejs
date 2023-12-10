@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/e48d166edc.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/Assets/login.css">
+    
+    <title>Signup Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="/Assets/jq.js"></script>
+    <script>
+        function CheckNewAccount() 
+        {
+            var name = document.getElementById('Name').value;
+            var email = document.getElementById('Email').value;
+            var username = document.getElementById('Username').value;
+            var password = document.getElementById('Password').value;
+            var gender = document.getElementById('Gender').value;
+            var age = document.getElementById('age').value;
+            
+             // Validate email format
+             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            // Validate password
+            var passwordRegex = /^(?=.*[A-Z]).{8,}$/;
+            // Validate name
+            if (!name.trim()) 
+            {
+                $("#msg").html('Name cannot be empty');
+                event.preventDefault();
+                return false;
+            }
+            else if (!email.match(emailRegex)) {
+                $("#msg").html('Invalid email format');
+                return;
+            }
+            else if (!username.trim()) 
+            {
+                $("#msg").html('Username cannot be empty');
+                event.preventDefault();
+                return false;
+            }
+            else if (!password.match(passwordRegex)) {
+                $("#msg").html('Password must have at least 8 characters and contain at least one capital letter');
+                event.preventDefault();
+                return false;
+            }
+            // Validate gender
+            else if (!gender) 
+            {
+                alert('Please select a gender');
+                $("#msg").html('Please select a gender');
+                event.preventDefault();
+                return false;
+            }
+            else if (age <= 16) 
+            {
+                $("#msg").html('Please check your age');
+                event.preventDefault();
+                return false;
+            }
+            else
+            {
+                var SignUpAuth = {'Name': $("#Name").val(), 'Email': $("#Email").val(), 'Username': $("#Username").val(), 'Password': $("#Password").val(), 'Gender': $("#Gender").val(), 'age': $("#age").val()};
+                $.ajax({
+                    type: "POST",
+                    url: "/api/useraccounts",
+                    data: JSON.stringify(SignUpAuth),
+                    contentType: 'application/json',
+                    success: function (response) 
+                    {
+                        if(response.message == "user has been created")
+                        {
+                            window.location.href="/signin";
+                        }
+                        else
+                        {
+                            $("#msg").html(response.message);
+                        }
+                    },
+                    error: function (error) 
+                    {
+                        var errorMessage = "Error during signup. Please try again.";
+                        if (error.responseJSON && error.responseJSON.message) 
+                        {
+                            errorMessage = error.responseJSON.message;
+                        }
+                        $("#msg").html(errorMessage);
+                    }
+                });
+            }
+        }
+</script>
+</head>
+<body>
+    <div class="container">
+        <div class="img">
+            <img src="/Assets/img/BG.png" alt="BG">
+        </div>
+        <div class="login-content">
+            <form action="/api/useraccounts" id="signup" method="POST" onsubmit="CheckNewAccount(); return false;">
+                <div class="title-container">
+                    <h1>Signup</h1>
+                    <h2>Hello, Friends!</h2>
+                    <p>Enter your personal detail and start journey with us.</p>
+                </div>
+                <div class="login-inner-content">
+                    <div class="input-div one">
+                        <div class="i">
+                            <i class="far fa-user-circle"></i>
+                        </div>
+                        <div class="div">
+                            <h5>Name</h5>
+                            <input type="text" name="Name" id="Name" class="input">
+                        </div>
+                    </div>
+                    <div class="input-div one">
+                        <div class="i">
+                            <i class="far fa-user-circle"></i>
+                        </div>
+                        <div class="div">
+                            <h5>Email</h5>
+                            <input type="email" name="Email" id="Email" class="input">
+                        </div>
+                    </div>
+                    <div class="input-div one">
+                        <div class="i">
+                            <i class="far fa-user-circle"></i>
+                        </div>
+                        <div class="div">
+                            <h5>Username</h5>
+                            <input type="text" name="Username" id="Username" class="input">
+                        </div>
+                    </div>
+                    
+                    <div class="input-div pass">
+                        <div class="i">
+                            <i class="fas fa-eye" onclick="show()"></i>
+                        </div>
+                        <div class="div">
+                            <h5>Password</h5>
+                            <input id="Password" name="Password"  type="password" class="input">
+                        </div>
+                    </div>
+                    <div class="" style="width:100%; border:solid 0px">
+                        <table style="width:100%">
+                            <tr>
+                                <td style="width:50%">
+                                    <select id="Gender" name="Gender" style="width: 350px; height: 40px; padding: 10px; border-radius: 5px; border:solid 0px lightgray; font-size: 17px; color:gray">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="input-div pass">
+                        <div class="div">
+                            <h5>Age</h5>
+                            <input id="age" name="age"  type="number" class="input" style="width: 350px; height: 40px; padding: 10px; border-radius: 5px; border:solid 0px lightgray; font-size: 17px; color:gray">
+                        </div>
+                    </div>
+               
+                </div>
+                
+                <input type="submit" class="btn" value="Register">
+                <br>
+                <span id="msg"></span>
+                <h3>
+                    <a href="/signin">Login</a> | 
+                    <a href="/index">Home</a>
+                </h3>
+            </form>
+        </div>
+    </div>
+    <script src="/Assets/login.js"></script>
+</body>
+<script>
+</script>
+</html>

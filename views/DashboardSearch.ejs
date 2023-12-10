@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--favicon-->
+	<link rel="icon" href="/vlibrary/img/vlogo.png" type="image/png" />
+	<!--plugins-->
+	<link href="/dashboard_assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+	<link href="/dashboard_assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+	<link href="/dashboard_assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+    <link href="/dashboard_assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+	<!-- loader-->
+	<link href="/dashboard_assets/css/pace.min.css" rel="stylesheet" />
+	<script src="/dashboard_assets/js/pace.min.js"></script>
+	<!-- Bootstrap CSS -->
+	<link href="/dashboard_assets/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/dashboard_assets/css/bootstrap-extended.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+	<link href="/dashboard_assets/css/app.css" rel="stylesheet">
+	<link href="/dashboard_assets/css/icons.css" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="/dashboard_assets/css/dark-theme.css" />
+	<link rel="stylesheet" href="/dashboard_assets/css/semi-dark.css" />
+	<link rel="stylesheet" href="/dashboard_assets/css/header-colors.css" />
+
+	<title>.::Vitamin</title>
+	<script src="/assets/jquery-3.6.4.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+	<script src="/dashboard_assets/js/app.js"></script>
+	<script>
+	var VitaminOption='';
+	var Vitaminvalue='';
+	var RMessage='';
+	var sVitamin='';
+	var sVitaminLevel='';
+	var sVitaminValue='';
+	var sVitaminUnit='';
+	var sDate='';
+	var sformName='';
+	var sUserId='';
+	$(document).ready(function () 
+	{});
+
+	function SearchVitaminbyValue(VitaminOption, Vitaminvalue, RMessage, sVitamin, sVitaminLevel1, sVitaminValue1, sVitaminUnit1, sDate1, frmName) 
+	{
+    var Found = false;
+    var txt = "Vitamin " + VitaminOption.toLowerCase();
+    var table = document.getElementById('tbl_vitamin');
+    var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    document.getElementById('sDate').value = new Date().toISOString();
+    document.getElementById('sVitamin').value = txt;
+	if(Vitaminvalue<=0 || Vitaminvalue=="")
+	{alert("Enter Vitamin Value only...");}
+	else
+	{
+		for (var i = 0; i < rows.length; i++) 
+		{
+			var vitaminName = rows[i].getElementsByTagName('td')[1].innerText.toLowerCase();
+			if (vitaminName.toLowerCase().includes(txt.toLowerCase())) 
+			{
+				var levelOption = '';
+				var Startval = parseFloat(rows[i].getElementsByTagName('td')[3].innerText);
+				var Endvalue = parseFloat(rows[i].getElementsByTagName('td')[4].innerText);
+				if (Vitaminvalue > Endvalue) 
+				{
+					
+					document.getElementById(RMessage).innerHTML = "Response (High)<br><font color='blue'>" + rows[i].getElementsByTagName('td')[11].innerText.replace(/\n/g, '<br>') + "</font>";
+					levelOption = "High";
+				} else if (Vitaminvalue < Startval) 
+				{
+					levelOption = "Low";
+					
+					document.getElementById(RMessage).innerHTML = "Response (Low)<br><font color='red'>" + rows[i].getElementsByTagName('td')[9].innerText.replace(/\n/g, '<br>');
+				} else if (Vitaminvalue >= Startval && Vitaminvalue <= Endvalue) 
+				{
+					levelOption = "Normal";
+					
+					document.getElementById(RMessage).innerHTML = "Response (Normal)<br><font color='green'>" + rows[i].getElementsByTagName('td')[7].innerText.replace(/\n/g, '<br>');
+				}
+				document.getElementById(sVitamin).value = txt;
+				document.getElementById(sVitaminLevel1).value = levelOption;
+				document.getElementById(sVitaminValue1).value = Vitaminvalue;
+				document.getElementById(sVitaminUnit1).value = rows[i].getElementsByTagName('td')[5].innerText;
+				document.getElementById(sDate1).value = new Date().toLocaleString();
+				sVitaminUnit =  rows[i].getElementsByTagName('td')[5].innerText;
+
+			
+				var additionalData = 
+				{
+					'sVitamin': txt,
+					'sVitaminLevel': levelOption,
+					'sVitaminValue': Vitaminvalue,
+					'sVitaminUnit': rows[i].getElementsByTagName('td')[5].innerText,
+					'sUserId': document.getElementById("sUserId").value,
+					'sDate': new Date().toLocaleString()
+				};
+				var cnfrm = confirm("do you want to post?");
+				if(cnfrm==true)
+				{
+					$.ajax({
+						type: "POST",
+						url: "/api/searchhistory",
+						data: JSON.stringify(additionalData),
+						contentType: 'application/json',
+						success: function (response) 
+						{
+							$("#successMessage").text("Alpha" + response).show();
+							
+						},
+						error: function (error) 
+						{
+							console.error("Error saving search history:", error);
+							
+						}
+					});
+				}
+				Found = true;
+				break; // Break out of the loop 
+			}
+		}
+		if (Found)
+		{
+			
+			// Destroy existing chart if it exists
+			if (window.myChart) 
+			{
+				
+				console.log('chart is destroy');
+				var CurrentLoggedUserId = document.getElementById("sUserId").value;
+				GetGraphDataBy_API(CurrentLoggedUserId);
+			}
+			
+		} 
+		else 
+		{
+			document.getElementById("result_found").style.display = "none";
+		}
+	}
+}
+</script>
+</head>
+
+<body>
+	<!--wrapper-->
+	<div class="wrapper">
+		<!--sidebar wrapper -->
+		<div class="sidebar-wrapper" data-simplebar="true">
+			<div class="sidebar-header">
+				<div>
+					<img src="/vlibrary/img/vlogo.png" class="logo-icon" alt="logo icon">
+				</div>
+				<div>
+					<h4 class="logo-text">VitaVerse</h4>
+				</div>
+				<div class="toggle-icon ms-auto"><i class='bx bx-arrow-to-left'></i>
+				</div>
+			</div>
+			<!--navigation-->
+			<ul class="metismenu" id="menu">
+				<li>
+					<a href="/student_dashboard">
+						<div class="parent-icon"><i class='bx bx-home-circle'></i>
+						</div>
+						<div class="menu-title">Dashboard</div>
+					</a>
+				</li>
+				<li>
+					<ul>
+						<li><a href="/DashboardSearch"><i class="bx bx-right-arrow-alt"></i>Search vitamin</a></li>
+						</ul>
+				</li>
+			</ul>
+
+			<!--end navigation-->
+		</div>
+		<!--end sidebar wrapper -->
+		<!--start header -->
+		<header>
+			<div class="topbar d-flex align-items-center">
+				<nav class="navbar navbar-expand">
+					<div class="mobile-toggle-menu"><i class='bx bx-menu'></i>
+					</div>
+					<div class="search-bar flex-grow-1" style="display: none;">
+						<div class="position-relative search-bar-box">
+							<input type="text" class="form-control search-control" placeholder="Type to search..."> <span class="position-absolute top-50 search-show translate-middle-y"><i class='bx bx-search'></i></span>
+							<span class="position-absolute top-50 search-close translate-middle-y"><i class='bx bx-x'></i></span>
+						</div>
+					</div>
+					<div class="top-menu ms-auto">
+						<ul class="navbar-nav align-items-center" style="display: none;">
+							<li class="nav-item mobile-search-icon">
+								<a class="nav-link" href="#">	<i class='bx bx-search'></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="user-box dropdown">
+						<a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<img src="https://ih1.redbubble.net/image.354141339.0289/st,small,507x507-pad,600x600,f8f8f8.u2.jpg" class="user-img" alt="user avatar">
+							<div class="user-info ps-3">
+								<p class="user-name mb-0"><%= Name %></p>
+								<p class="designattion mb-0"><%= UType %></p>
+							</div>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li><a class="dropdown-item" href="/Userprofile"><i class="bx bx-user"></i><span>Profile</span></a></li>
+							<li><a class="dropdown-item" href="/changepassword"><i class="bx bx-cog"></i><span>Change Password</span></a></li>
+
+							<li>
+								<div class="dropdown-divider mb-0"></div>
+							</li>
+							<li><a class="dropdown-item" href="/logout"><i class='bx bx-log-out-circle'></i><span>Logout</span></a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</div>
+		</header>
+		<!--end header -->
+		<!--start page wrapper -->
+		<div class="page-wrapper">
+			<div class="page-content">
+				<div id="successMessage" style="display: none; color: green;"></div>
+				<div class="row">
+					<div class="card">
+						<div class="card-body">
+							<div class="table-responsive">
+									<h4 class="bg-light-success">Dashboard</h4><hr>
+									<div style="display: none;">
+										<label for="vitaminSelect">Select Vitamin:</label>
+										<select id="vitaminSelect">
+											<!-- Add options dynamically based on available vitamins -->
+										</select>
+										<button onclick="handleVitaminSelection()">Get Data</button>
+									</div>
+									
+									
+									<form action="/api/searchhistory" method="POST" id="admin_VitaminA" >
+										<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin A
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="2">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin A Value</td>
+													<td><input type="number" id="vav" name="vav" class="form-control"></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="hidden" id="sVitamin" name="sVitamin">
+														<input type="hidden" id="sVitaminLevel" name="sVitaminLevel">
+														<input type="hidden" id="sVitaminValue" name="sVitaminValue">
+														<input type="hidden" id="sVitaminUnit" name="sVitaminUnit">
+														<input type="hidden" id="sUserId" name="sUserId" value="<%= Email %>">
+														<input type="hidden" id="sDate" name="sDate">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('A',vav.value,'vaResponse','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminA')">
+													</td>
+												</tr>
+												<tr>
+													<td colspan="2" id="vaResponse">
+													</td>
+												</tr>
+											</table>
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart1" width="400" height="200"></canvas>
+											</td>
+										</tr>
+										</table>
+									</form>
+									<form action="/api/searchhistory" method="POST" id="admin_VitaminC" >
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin C
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin C Value</td>
+													<td><input type="text" class="form-control" id="vcv" name="vcv"></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('C',vcv.value,'vcResponse','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminC')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vcResponse" colspan="2">
+														Response
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart2" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+								</form>
+								<form action="/api/searchhistory" method="POST" id="admin_VitaminD" ></form>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin D
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin D Value</td>
+													<td><input type="text" class="form-control" id="vdv" name="vdv"></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('D',vdv.value,'vdResponse','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vdResponse"  colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart3" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+								</form>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin E
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin E Value</td>
+													<td><input type="text" class="form-control" id="vev" name="vev"></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('E',vev.value,'veResponse','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="veResponse" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart4" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin K
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin K Value</td>
+													<td><input type="text" class="form-control" id="vkv" name="vkv"></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('K',vkv.value,'vkResponse','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vkResponse" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart5" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B1 Value</td>
+													<td><input type="text" class="form-control" id="vb1v" name="vb1v"></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B',vb1v.value,'vb1Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb1Response" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart6" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B2
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B2 Value</td>
+													<td><input type="text" class="form-control" id="vb2v" name="vb2v"></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B2',vb2v.value,'vb2Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb2Response" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart7" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B3
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B3 Value</td>
+													<td><input type="text" class="form-control" id="vb3v" name="vb3v"></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B3',vb3v.value,'vb3Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb3Response" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart8" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B5
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B5 Value</td>
+													<td><input type="text" class="form-control" id="vb5v" name="vb5v"></td>
+													<td></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B5',vb5v.value,'vb5Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb5Response" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart9" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B6
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B6 Value</td>
+													<td><input type="text" class="form-control" id="vb6v" name="vb6v"></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B6',vb6v.value,'vb6Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb6Response" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart10" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B7 
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B7  Value</td>
+													<td><input type="text" class="form-control" id="vb7v" name="vb7v"></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B7',vb7v.value,'vb7Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb7Response" colspan="2">
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart11" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B9  
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B9   Value</td>
+													<td><input type="text" class="form-control" id="vb9v" name="vb9v"></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B9',vb9v.value,'vb9Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb9Response" colspan="2">
+														
+													</td>
+												</tr>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart12" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+									<table style="width: 100%;" class="table" border="1">
+										<tr>
+											<td  colspan="2" style="width: 10%;">Vitamin B12   
+											<table style="width: 100%;">
+												<tr>
+													<td colspan="3">Check % in your report</td>
+												</tr>
+												<tr>
+													<td>Vitamin B12    Value</td>
+													<td><input type="text" class="form-control" id="vb12v" name="vb12v"></td>
+												</tr>
+												<tr>
+													<td colspan="2" align="right">
+														<input type="button" value="Submit" onclick="SearchVitaminbyValue('B12',vb12v.value,'vb12Response','sVitamin','sVitaminLevel','sVitaminValue','sVitaminUnit','sDate','admin_VitaminD')">
+													</td>
+												</tr>
+												<tr>
+													<td id="vb12Response" colspan="2">
+														
+													</td>
+												</tr>
+											</table>
+											
+											</td>
+											<td style="width: 1%; border:solid 1px">
+												<canvas id="vitaminChart13" width="400" height="200"></canvas>
+											</td>
+										</tr>
+									</table>
+
+									<table style="display: none;" id="tbl_vitamin">
+										<tbody>
+										<% var j=1;  for(var i=0; i<Vitamin.length; i++)
+										{ %>
+											<tr>
+												<td><%= j %></td>
+												<td><%= Vitamin[i].VitaminName %></td>
+												<td><%= Vitamin[i].VitaminDietary %></td>
+												<td><%= Vitamin[i].RangeStart %></td>
+												<td><%= Vitamin[i].RangeEnd %></td>
+												<td><%= Vitamin[i].UnitType %></td>
+												<td><%= Vitamin[i].LevelType %></td>
+												<td><%= Vitamin[i].Description %></td>
+												<td><%= Vitamin[i].LowLevel %></td>
+												<td><%= Vitamin[i].DescriptionLow %></td>
+												<td><%= Vitamin[i].HighLevel %></td>
+												<td><%= Vitamin[i].DescriptionHigh %></td>
+												<td><%= Vitamin[i].Status %></td>
+												<td><%= Vitamin[i].CreatedDate %></td>
+												<td><%= Vitamin[i].CreatedBy %></td>
+											</tr>
+										<% j++}
+										%> 
+									</tbody>
+									</table>
+								</form>
+
+								<div class="row">
+									<div class="card">
+										<div class="card-body">
+											<div class="table-responsive" id="result_found" style="display:none;">
+												<h1>Found</h1><hr>
+												<form action="/api/useraccounts" method="POST" id="User_Profile"> 
+												<table class="table table-condensed" style="width: 100%;" >
+													<tr>
+														<td id="vNameDetail"></td>
+													</tr>
+													<tr>
+														<td id="vlevelrange"></td>
+													</tr>
+													
+													<tr>
+														<td>Detail</td>
+													</tr>
+													<tr>
+														<td id="vdetail"></td>
+													</tr>
+													
+												</table>
+											</form>
+											</div>
+											
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--end page wrapper -->
+		<!--start overlay-->
+		<div class="overlay toggle-icon"></div>
+		<!--end overlay-->
+		<!--Start Back To Top Button--> <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+		<!--End Back To Top Button-->
+		<footer class="page-footer">
+			<p class="mb-0">Copyright © 2021. All right reserved.</p>
+		</footer>
+	</div>
+	<!--end wrapper-->
+	
+	<!-- Bootstrap JS -->
+	<script src="/dashboard_assets/js/bootstrap.bundle.min.js"></script>
+	<!--plugins-->
+	<script src="/dashboard_assets/js/jquery.min.js"></script>
+	<script src="/dashboard_assets/plugins/simplebar/js/simplebar.min.js"></script>
+	<script src="/dashboard_assets/plugins/metismenu/js/metisMenu.min.js"></script>
+	<script src="/dashboard_assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+
+	<script src="/dashboard_assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+	<script src="/dashboard_assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+	<!--app JS-->
+	<script>
+		$(document).ready(function() {
+			$('#example').DataTable();
+		  } );
+	</script>
+	<script>
+		$(document).ready(function() {
+			var table = $('#example2').DataTable( {
+				lengthChange: false,
+				buttons: [ 'copy', 'excel', 'pdf', 'print']
+			} );
+		 
+			table.buttons().container()
+				.appendTo( '#example2_wrapper .col-md-6:eq(0)' );
+		} );
+
+	</script>
+	
+	<script>
+		var sUserId='taha';
+		var vitaminData = {};
+		var chartType = 'line'; // Default chart type
+		var selectedVitamin = 'Vitamin A'; // Default selected vitamin
+		function handleVitaminSelection() 
+		{
+			selectedVitamin = $('#vitaminSelect').val();
+		}
+		function updateChart(data, chartType,DISPLY_DIV_ID,VitaminOption,account_id) 
+		{
+			var ctx = document.getElementById(DISPLY_DIV_ID).getContext('2d');
+			
+			// Check if data is an object and convert it to an array
+			const dataArray = Array.isArray(data) ? data : Object.values(data);
+			// Extract unique vitamins from the data
+			const vitamins = [...new Set(dataArray.map(item => item.sVitamin))];
+			// Populate the vitamin dropdown dynamically
+			$('#vitaminSelect').empty();
+			vitamins.forEach(vitamin => 
+			{
+				$('#vitaminSelect').append(`<option value="${vitamin}">${vitamin}</option>`);
+			});
+			// Extract date-wise values for all vitamins for the specified user (sUserId)
+			var dateWiseData = {};
+			var EmailAddress='';
+			sUserId = account_id; 
+			EmailAddress = account_id;
+			
+			dateWiseData[VitaminOption] = {};
+		
+			dataArray.forEach(item => 
+			{
+				// Filter data for the specified user
+				if (item.sUserId === sUserId && item.sVitamin.toLowerCase() === VitaminOption.toLowerCase()) 
+				{
+					
+					EmailAddress = item.sUserId;
+					var date = parseCustomDateFormat(item.sDate);
+					var time = date.toLocaleTimeString(); // Get the time part
+					date = date.toLocaleDateString(); // Get the date part
+					var value = item.sVitaminValue;
+					var level = item.sVitaminLevel;
+		
+					// Set different colors based on vitaminLevel
+					var backgroundColor, borderColor, borderWidth;
+					if (level === 'low') {
+						backgroundColor = 'rgba(255, 0, 0, 0.2)'; // Red color for low
+						borderColor = 'rgba(255, 0, 0, 1)';
+						borderWidth = 1;
+					} else if (level === 'normal') {
+						backgroundColor = 'rgba(0, 255, 0, 0.2)'; // Green color for normal
+						borderColor = 'rgba(0, 255, 0, 1)';
+						borderWidth = 1;
+					} else if (level === 'high') {
+						backgroundColor = 'rgba(255, 0, 0, 0.2)'; // Red color for highhh
+						borderColor = 'rgba(255, 0, 0, 1)';
+						borderWidth = 1;
+					}
+		
+					// Create a unique label combining date and time
+					var label = `${date} ${time}`;
+					// Store data for each vitamin, date, and time combination
+					if (!dateWiseData[VitaminOption][label]) 
+					{
+						dateWiseData[VitaminOption][label] = 
+						{
+							value: value,
+							unit: item.sVitaminUnit,
+							level: item.sVitaminLevel,
+							backgroundColor: backgroundColor,
+							borderColor: borderColor,
+							borderWidth: borderWidth
+						};
+					}
+				}
+			});
+			// Create a new chart with a separate line for each vitamin
+			window.myChart = new Chart(ctx, {
+			type: chartType,
+			data: {
+				labels: Object.keys(dateWiseData[VitaminOption] || {}),
+				datasets: [{
+					label: VitaminOption,  // Use the custom vitamin as the label
+					data: Object.keys(dateWiseData[VitaminOption]).map(date => ({
+						x: date,
+						y: dateWiseData[VitaminOption][date].value,
+						borderColor: dateWiseData[VitaminOption][date].borderColor,
+						backgroundColor: dateWiseData[VitaminOption][date].backgroundColor,
+						borderWidth: dateWiseData[VitaminOption][date].borderWidth
+					}))
+				}]
+			},
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true
+					}
+				},
+				plugins: {
+					tooltip: {
+						callbacks: {
+							label: function (context) {
+								var label = context.dataset.label || '';
+								var value = context.parsed.y;
+								var unit = dateWiseData[VitaminOption][context.label].unit;
+								var level = dateWiseData[VitaminOption][context.label].level;
+								return label + ': ' + value + ' ' + unit + ' ' + level;
+							}
+						}
+					},
+					legend: {
+						display: true,
+						position: 'top',
+					},
+					title: {
+						display: true,
+						text: 'Date-wise Vitamin Values (User: '+EmailAddress+')',
+						fontSize: 16
+					},
+					elements: {
+						line: {
+							tension: 0, // Disable  curves for the lines
+						}
+					},
+					datalabels: {
+						display: true,
+						color: 'black',
+						backgroundColor: function (context) {
+							return context.dataset.backgroundColor;
+						},
+						borderRadius: 4,
+						font: {
+							weight: 'bold'
+						},
+						formatter: function (value, context) {
+							return value + ' ' + context.dataset.data[context.dataIndex].unit;
+						}
+					}
+				}
+			}
+		});
+
+		}
+		function parseCustomDateFormat(dateString) {
+			var parts = dateString.split(/[\s,\/:]+/); // Split the date string into parts
+			var day = parseInt(parts[0], 10);
+			var month = parseInt(parts[1], 10) - 1; // Months are zero-based in JavaScript
+			var year = parseInt(parts[2], 10);
+			var hours = parseInt(parts[3], 10);
+			var minutes = parseInt(parts[4], 10);
+			var seconds = parseInt(parts[5], 10);
+			return new Date(year, month, day, hours, minutes, seconds);
+		}
+		function getRandomColor() {
+			var letters = '0123456789ABCDEF';
+			var color = '#';
+			for (var i = 0; i < 6; i++) {
+				color += letters[Math.floor(Math.random() * 16)];
+			}
+			return color;
+		}
+		$(document).ready(function () 
+		{
+			sUserId = document.getElementById("sUserId").value;
+			GetGraphDataBy_API(sUserId);
+		});
+		function GetGraphDataBy_API(CurrentLoggedUserId)
+		{
+			 // Make an Ajax request on page load with the user ID 'leen'
+			 $.ajax({
+				url: 'api/searchhistory', // Replace with your actual URL
+				method: 'GET',
+				data: { sUserId: CurrentLoggedUserId },
+				dataType: 'json',
+				success: function (data) 
+				{
+					//console.log(data);
+					// Call updateChart with the extracted data
+					updateChart(data, 'line',"vitaminChart1","Vitamin A",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart2","Vitamin C",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart3","Vitamin D",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart4","Vitamin E",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart5","Vitamin K",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart6","Vitamin B",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart7","Vitamin B2",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart8","Vitamin B3",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart9","Vitamin B5",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart10","Vitamin B6",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart11","Vitamin B7",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart12","Vitamin B9",CurrentLoggedUserId);
+					updateChart(data, 'line',"vitaminChart13","Vitamin B12",CurrentLoggedUserId);
+				},
+				error: function (error) 
+				{
+					console.error('Error fetching data:', error);
+				}
+			});
+		}
+		
+	</script>
+</body>
+
+</html>

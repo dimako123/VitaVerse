@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/e48d166edc.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/Assets/login.css">
+    
+    <title>Verification</title>
+    <script src="/Assets/jq.js"></script>
+    <script src="/assets/jquery-3.6.4.min.js"></script>
+
+	<script>
+		$(document).ready(function()
+		{
+
+           
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            document.getElementById("_id").value=id;
+			$("#User_Profile").submit(function(event)
+			{
+				if (!CheckVerifyAccount()) 
+				{
+                    event.preventDefault(); // Prevent form submission if validation fails
+                } 
+				else 
+				{
+                    var Uid = document.getElementById("_id").value;
+					event.preventDefault();
+					var unindexed_array = $(this).serializeArray()
+					var data={}
+		
+					$.map(unindexed_array,function(n,i)
+					{
+						data[n['name']] = n['value']
+					})
+					console.log(unindexed_array);
+					console.log(data);
+					var request={
+						"url":'http://localhost:4000/api/useraccounts/'+Uid,
+						"method":'PUT',
+						"data":data
+					}
+					$.ajax(request).done(function(response){
+						alert("User Activated Successfully");
+                        window.location.href="/signin";
+					});
+                }
+			})
+		});
+		function CheckVerifyAccount()
+		{
+			var oldEmail= document.getElementById("sp_email").innerHTML;
+			var providedEmail= document.getElementById("Email").value;
+			if(oldEmail != providedEmail)
+			{
+					alert("Provide your Registered Email to verify your Account.");
+					return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+		</script>
+
+
+
+    <script>
+   
+
+       function b64DecodeUnicode(str) 
+       {
+            var decodedString = atob(str);
+            var bytes = new Uint8Array(decodedString.length);
+            for (var i = 0; i < decodedString.length; i++) {
+                bytes[i] = decodedString.charCodeAt(i);
+            }
+            var decodedUnicodeString = new TextDecoder('utf-8').decode(bytes);
+            return decodedUnicodeString;
+        }
+
+        function decryptEmailFromUrl() {
+    var url = window.location.href;
+    var encryptedEmail = url.split('q=')[1].split('&')[0]; // Extract the encrypted email from the URL
+
+    // Decode the Base64url-encoded email
+    var decryptedEmail = atob(encryptedEmail);
+
+    console.log('Decrypted Email:', decryptedEmail);
+    document.getElementById("sp_email").innerHTML = decryptedEmail;
+}
+
+// Call the decryption function when the page loads
+window.onload = decryptEmailFromUrl;
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="img">
+            <img src="/Assets/img/BG.png" alt="BG">
+        </div>
+        <div class="login-content">
+            <form action="/api/useraccounts/" method="POST" id="User_Profile">
+                <div class="title-container">
+                    <h1>Verfication</h1>
+                    <h2>Hello, Friends!</h2>
+                </div>
+                <div class="login-inner-content">
+                    <div class="input-div one">
+                        <div class="i">
+                            <i class="far fa-user-circle"></i>
+                        </div>
+                        <div class="div">
+                            <h5>User id</h5>
+                            <input type="hidden" name="_id" id="_id" class="input">
+                            <input type="text" name="Email" id="Email" class="input">
+                        </div>
+                    </div>
+                </div>
+                <input type="submit" class="btn" value="Verify">
+                <h3>
+                    <a href="/index">Home</a>
+                </h3>
+            </form>
+        </div>
+    </div>
+    <script src="/Assets/login.js"></script>
+</body>
+</html>
+
+<span id="sp_email"></span>

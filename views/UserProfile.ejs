@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--favicon-->
+	<link rel="icon" href="/vlibrary/img/vlogo.png" type="image/png" />
+	<!--plugins-->
+	<link href="/dashboard_assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+	<link href="/dashboard_assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+	<link href="/dashboard_assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+    <link href="/dashboard_assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+	<!-- loader-->
+	<link href="/dashboard_assets/css/pace.min.css" rel="stylesheet" />
+	<script src="/dashboard_assets/js/pace.min.js"></script>
+	<!-- Bootstrap CSS -->
+	<link href="/dashboard_assets/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/dashboard_assets/css/bootstrap-extended.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+	<link href="/dashboard_assets/css/app.css" rel="stylesheet">
+	<link href="/dashboard_assets/css/icons.css" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="/dashboard_assets/css/dark-theme.css" />
+	<link rel="stylesheet" href="/dashboard_assets/css/semi-dark.css" />
+	<link rel="stylesheet" href="/dashboard_assets/css/header-colors.css" />
+
+	<title>.::Profile</title>
+	<script src="/assets/jquery-3.6.4.min.js"></script>
+
+	<script>
+		$(document).ready(function()
+		{
+
+			$("#User_Profile").submit(function(event)
+			{
+
+				
+					var Uid = document.getElementById("_id").value;
+					event.preventDefault();
+					var unindexed_array = $(this).serializeArray()
+					var data={}
+					$.map(unindexed_array,function(n,i)
+					{
+						data[n['name']] = n['value']
+					})
+					
+					console.log(data);
+					var request={
+						"url":'http://localhost:4000/api/useraccounts/'+Uid,
+						"method":'PUT',
+						"data":data
+					}
+					$.ajax(request).done(function(response){
+						alert("User Username Updated");
+					});
+				}
+				
+			)
+		});
+		
+
+		function validateForm() 
+  {
+            var name = document.getElementById('Name').value;
+            var email = document.getElementById('Email').value;
+            var username = document.getElementById('Username').value;
+            var gender = document.getElementById('Gender').value;
+
+             // Validate email format
+             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+       
+            if (!email.match(emailRegex)) {
+                $("#msg").html('Invalid email format');
+                return false;
+            }
+            else if (!username.trim()) 
+            {
+                $("#msg").html('Username cannot be empty');
+                return false;
+            }
+            // Validate gender
+            else if (!gender) {
+                alert('Please select a gender');
+                $("#msg").html('Please select a gender');
+                return false;
+            }
+            else
+            {
+                // All validations passed
+                return true;
+            }
+        }
+		</script>
+
+</head>
+<body>
+	<!--wrapper-->
+	<div class="wrapper">
+		<!--sidebar wrapper -->
+		<div class="sidebar-wrapper" data-simplebar="true">
+			<div class="sidebar-header">
+				<div>
+					<img src="/vlibrary/img/vlogo.png" class="logo-icon" alt="logo icon">
+				</div>
+				<div>
+					<h4 class="logo-text">VitaVerse</h4>
+				</div>
+				<div class="toggle-icon ms-auto"><i class='bx bx-arrow-to-left'></i>
+				</div>
+			</div>
+			<!--navigation-->
+			<ul class="metismenu" id="menu">
+				<li>
+					<% if (UType === "Administrator") { %>
+						<a href="/admin_dashboard">
+							<div class="parent-icon"><i class='bx bx-home-circle'></i></div>
+							<div class="menu-title">Dashboard</div>
+						</a>
+					<% } else { %>
+						<a href="/student_dashboard">
+							<div class="parent-icon"><i class='bx bx-home-circle'></i></div>
+							<div class="menu-title">Dashboard</div>
+						</a>
+					<% } %>
+				</li>
+			</ul>
+			<!--end navigation-->
+		</div>
+		<!--end sidebar wrapper -->
+		<!--start header -->
+		<header>
+			<div class="topbar d-flex align-items-center">
+				<nav class="navbar navbar-expand">
+					<div class="mobile-toggle-menu"><i class='bx bx-menu'></i>
+					</div>
+					<div class="search-bar flex-grow-1" style="display: none;">
+						<div class="position-relative search-bar-box">
+							<input type="text" class="form-control search-control" placeholder="Type to search..."> <span class="position-absolute top-50 search-show translate-middle-y"><i class='bx bx-search'></i></span>
+							<span class="position-absolute top-50 search-close translate-middle-y"><i class='bx bx-x'></i></span>
+						</div>
+					</div>
+					<div class="top-menu ms-auto">
+						<ul class="navbar-nav align-items-center" style="display: none;">
+							<li class="nav-item mobile-search-icon">
+								<a class="nav-link" href="#">	<i class='bx bx-search'></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="user-box dropdown">
+						<a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<img src="https://ih1.redbubble.net/image.354141339.0289/st,small,507x507-pad,600x600,f8f8f8.u2.jpg" class="user-img" alt="user avatar">
+							<div class="user-info ps-3">
+								<p class="user-name mb-0"><%= Name %></p>
+								<p class="designattion mb-0"><%= UType %></p>
+							</div>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<% if (UType === "Administrator") { %>
+								<li><a class="dropdown-item" href="/changepassword"><i class="bx bx-cog"></i><span>Change Password</span></a></li>
+							<% } else { %>
+								<li><a class="dropdown-item" href="/Userprofile"><i class="bx bx-user"></i><span>Profile</span></a></li>
+								<li><a class="dropdown-item" href="/changepassword"><i class="bx bx-cog"></i><span>Change Password</span></a></li>
+							<% } %>
+						
+							<li>
+								<div class="dropdown-divider mb-0"></div>
+							</li>
+							<li><a class="dropdown-item" href="/logout"><i class='bx bx-log-out-circle'></i><span>Logout</span></a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</div>
+		</header>
+		<!--end header -->
+
+		<div class="page-wrapper">
+			<div class="page-content">
+			
+				<div class="row">
+					<div class="card">
+						<div class="card-body">
+							<div class="table-responsive">
+								<h1>Profile</h1><hr>
+								<form action="/api/useraccounts/" method="POST" id="User_Profile"> 
+								<table cellpadding="5" cellspacing="10" >
+									<tr>
+										<td></td>
+										<td><input type="hidden" id="_id" name="_id" value="<%= ID %>" style="border:solid 0px"></td>
+									</tr>
+									<tr>
+										<td>Name</td>
+										<td><%= Name %></td>
+									</tr>
+									<tr>
+										<td>Email</td>
+										<td><%= Email %></td>
+										</tr>
+									<tr>
+										<td>Username</td>
+										<td><input type="text" value="<%= Username %>" name="Username" id="Username" class="form-control"></td>
+									</tr>
+									<tr>
+										<td>Gender</td>
+										<td>
+										<select id="Gender" name="Gender" style="width: 350px; height: 40px; padding: 10px; border-radius: 5px; border:solid 0px lightgray; font-size: 17px; color:gray">
+											<option value="Male" <%= Gender === 'Male' ? 'selected' : '' %>>Male</option>
+											<option value="Female" <%= Gender === 'Female' ? 'selected' : '' %>>Female</option>
+										</select>
+										
+										</td>
+									</tr>
+									<tr>
+										<td>Account Status</td>
+										<td><%= Status %></td>
+									</tr>
+									<tr>
+										<td>Account Type</td>
+										<td><%= UType %></td>
+									</tr>
+									<tr>
+										<td colspan="2" align="right">
+											<button class="btn btn-primary">Update Profile</button>
+										</td>
+									</tr>
+									<tr>
+										<td colspan="=2">
+											<span id="msg"></span>
+										</td>
+									</tr>
+								</table>
+							</form>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!--end page wrapper -->
+		<!--start overlay-->
+		<div class="overlay toggle-icon"></div>
+		<!--end overlay-->
+		<!--Start Back To Top Button--> <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+		<!--End Back To Top Button-->
+		<footer class="page-footer">
+			<p class="mb-0">Copyright © 2021. All right reserved.</p>
+		</footer>
+	</div>
+	<!--end wrapper-->
+
+	<!-- Bootstrap JS -->
+	<script src="/dashboard_assets/js/bootstrap.bundle.min.js"></script>
+	<!--plugins-->
+	<script src="/dashboard_assets/js/jquery.min.js"></script>
+	<script src="/dashboard_assets/plugins/simplebar/js/simplebar.min.js"></script>
+	<script src="/dashboard_assets/plugins/metismenu/js/metisMenu.min.js"></script>
+	<script src="/dashboard_assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+
+	<script src="/dashboard_assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+	<script src="/dashboard_assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+	<!--app JS-->
+	<script>
+		$(document).ready(function() {
+			$('#example').DataTable();
+		  } );
+	</script>
+	<script>
+		$(document).ready(function() {
+			var table = $('#example2').DataTable( {
+				lengthChange: false,
+				buttons: [ 'copy', 'excel', 'pdf', 'print']
+			} );
+		 
+			table.buttons().container()
+				.appendTo( '#example2_wrapper .col-md-6:eq(0)' );
+		} );
+	</script>
+	<script src="/dashboard_assets/js/app.js"></script>
+
+
+    
+</body>
+
+</html>

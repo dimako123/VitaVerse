@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--favicon-->
+	<link rel="icon" href="/vlibrary/img/vlogo.png" type="image/png" />
+	<!--plugins-->
+	<link href="/dashboard_assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+	<link href="/dashboard_assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
+	<link href="/dashboard_assets/plugins/metismenu/css/metisMenu.min.css" rel="stylesheet" />
+    <link href="/dashboard_assets/plugins/datatable/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+	<!-- loader-->
+	<link href="/dashboard_assets/css/pace.min.css" rel="stylesheet" />
+	<script src="/dashboard_assets/js/pace.min.js"></script>
+	<!-- Bootstrap CSS -->
+	<link href="/dashboard_assets/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/dashboard_assets/css/bootstrap-extended.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+	<link href="/dashboard_assets/css/app.css" rel="stylesheet">
+	<link href="/dashboard_assets/css/icons.css" rel="stylesheet">
+	<!-- Theme Style CSS -->
+	<link rel="stylesheet" href="/dashboard_assets/css/dark-theme.css" />
+	<link rel="stylesheet" href="/dashboard_assets/css/semi-dark.css" />
+	<link rel="stylesheet" href="/dashboard_assets/css/header-colors.css" />
+
+	<title>.::Users Feedback</title>
+	<script src="/assets/jquery-3.6.4.min.js"></script>
+	<script>
+	$(document).ready(function () {
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().split('T')[0];
+        document.getElementById('CreatedDate').value = formattedDate;
+
+        $("#admin_Vitamin").submit(function (event) {
+            // Call validateForm function before submitting the form
+            if (!validateForm()) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
+    });
+
+    function validateForm() {
+    var vitaminName = document.getElementById('VitaminName').value;
+    var referenceRangeStart = parseFloat(document.getElementById('RangeStart').value);
+    var referenceRangeEnd = parseFloat(document.getElementById('RangeEnd').value);
+    var unit = document.getElementById('Unit').value;
+    var status = document.getElementById('Status').value;
+
+    // Your validation logic goes here
+    if (!vitaminName.trim()) {
+        alert('Vitamin Name cannot be empty');
+        return false;
+    } else if (isNaN(referenceRangeStart) || referenceRangeStart >= referenceRangeEnd) {
+        alert('Reference Range Start must be a valid number and less than Reference Range End');
+        return false;
+    } else if (isNaN(referenceRangeEnd)) {
+        alert('Reference Range End must be a valid number');
+        return false;
+    } else if (!unit.trim()) {
+        alert('Provide Unit value');
+        return false;
+    } else if (status === 'Select') {
+        alert('Please select a Status');
+        return false;
+    } else {
+        // All validations passed
+        return true;
+    }
+}
+
+	function Delete(id)
+	{
+		var request = 
+		{
+			"url":'http://localhost:4000/api/Vitamin/'+id,
+			"method":'DELETE',
+		}
+		if(confirm("do you really want to delete this record"))
+		{
+			$.ajax(request).done(function(response)
+			{
+				alert("Data Deleted Successfully");
+				location.reload();
+			})
+		}
+	}
+	</script>
+</head>
+
+<body>
+	<!--wrapper-->
+	<div class="wrapper">
+		<!--sidebar wrapper -->
+		<div class="sidebar-wrapper" data-simplebar="true">
+			<div class="sidebar-header">
+				<div>
+					<img src="/vlibrary/img/vlogo.png" class="logo-icon" alt="logo icon">
+				</div>
+				<div>
+					<h4 class="logo-text">VitaVerse</h4>
+				</div>
+				<div class="toggle-icon ms-auto"><i class='bx bx-arrow-to-left'></i>
+				</div>
+			</div>
+			<!--navigation-->
+			<ul class="metismenu" id="menu">
+				<li>
+					<a href="/admin_dashboard">
+						<div class="parent-icon"><i class='bx bx-home-circle'></i>
+						</div>
+						<div class="menu-title">Dashboard</div>
+					</a>
+				</li>
+				<li class="menu-label">Activity Resources</li>
+				<li>
+					<a class="has-arrow" href="javascript:;">
+						<div class="parent-icon"><i class="bx bx-user-circle"></i>
+						</div>
+						<div class="menu-title">Menus</div>
+					</a>
+					<ul>
+						<li><a href="/admin_RegisteredUsers"><i class="bx bx-right-arrow-alt"></i>View Users</a></li>
+						<li><a href="/admin_vitamin"><i class="bx bx-right-arrow-alt"></i>Manage Vitamins</a></li>
+						<li><a href="/UserFeedback"><i class="bx bx-right-arrow-alt"></i>View Feedback</a></li>
+						<li><a href="/admin_ContactForm"><i class="bx bx-right-arrow-alt"></i>Contacted List</a></li>
+					</ul>
+				</li>
+			</ul>
+
+			<!--end navigation-->
+		</div>
+		<!--end sidebar wrapper -->
+		<!--start header -->
+		<header>
+			<div class="topbar d-flex align-items-center">
+				<nav class="navbar navbar-expand">
+					<div class="mobile-toggle-menu"><i class='bx bx-menu'></i>
+					</div>
+					<div class="search-bar flex-grow-1" style="display: none;">
+						<div class="position-relative search-bar-box">
+							<input type="text" class="form-control search-control" placeholder="Type to search..."> <span class="position-absolute top-50 search-show translate-middle-y"><i class='bx bx-search'></i></span>
+							<span class="position-absolute top-50 search-close translate-middle-y"><i class='bx bx-x'></i></span>
+						</div>
+					</div>
+					<div class="top-menu ms-auto">
+						<ul class="navbar-nav align-items-center" style="display: none;">
+							<li class="nav-item mobile-search-icon">
+								<a class="nav-link" href="#">	<i class='bx bx-search'></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div class="user-box dropdown">
+						<a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<img src="https://ih1.redbubble.net/image.354141339.0289/st,small,507x507-pad,600x600,f8f8f8.u2.jpg" class="user-img" alt="user avatar">
+							<div class="user-info ps-3">
+								<p class="user-name mb-0"><%= Name %></p>
+								<p class="designattion mb-0"><%= UType %></p>
+							</div>
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li><a class="dropdown-item" href="/Userprofile"><i class="bx bx-user"></i><span>Profile</span></a></li>
+							<li><a class="dropdown-item" href="/changepassword"><i class="bx bx-cog"></i><span>Change Password</span></a></li>
+
+							<li>
+								<div class="dropdown-divider mb-0"></div>
+							</li>
+							<li><a class="dropdown-item" href="/logout"><i class='bx bx-log-out-circle'></i><span>Logout</span></a>
+							</li>
+						</ul>
+					</div>
+				</nav>
+			</div>
+		</header>
+		<!--end header -->
+		<!--start page wrapper -->
+		<div class="page-wrapper">
+			<div class="page-content">
+				
+			 
+				<div class="row">
+					<div class="card">
+						<div class="card-body">
+							<div class="table-responsive">
+								<h1>Vitamin</h1><hr>
+								<form action="/api/Vitamin" method="POST" id="admin_Vitamin">
+									<table class="table table-borderless">
+										<tr>
+											<td style="width:20%">Vitamin Name<br>
+												<input type="text" name="VitaminName" id="VitaminName" class="form-control" placeholder="Enter Vitamin Name">
+											</td>
+											<td style="width:20%">Reference Range Start<br>
+												<input type="text" name="RangeStart" id="RangeStart" class="form-control" placeholder="Enter Reference Range Start">
+											</td>
+											<td style="width:20%">Reference Range End<br>
+												<input type="text" name="RangeEnd" id="RangeEnd" class="form-control" placeholder="Enter Reference Range End">
+											</td>
+											<td style="width:20%">Unit<br>
+												<input type="text" name="Unit" id="Unit" class="form-control" placeholder="Enter Unit">
+											</td>
+											<td>Status<br>
+												<select class="form-control" name="Status" id="Status">
+													<option>Select</option>
+													<option value="true">Active</option>
+													<option value="false">Inactive</option>
+												</select>
+												<input type="hidden" name="CreatedDate" id="CreatedDate">
+												<input type="hidden" name="CreatedBy" id="CreatedBy" value="<%= Name %>">
+											</td>
+											<td><br>
+												<Button  class="btn btn-primary">Submit</Button>
+											</td>
+										</tr>
+									</table>
+								</form>
+                                <hr>
+								<table id="example2" class="table table-striped table-bordered">
+									<thead>
+										<tr>
+										<th>ID</th>
+										<th>Vitamin Name</th>
+										<th>Reference Range Start</th>
+                                        <th>Reference Range End</th>
+										<th>Unit</th>
+										<th>Status</th>
+										<th>Created Date</th>
+										<th>Created By</th>
+										<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										<% var j=1;  for(var i=0; i<UserFeedback.length; i++)
+										{ %>
+											<tr>
+											<td><%= j %></td>
+											<td><%= UserFeedback[i].VitaminName %></td>
+											<td><%= UserFeedback[i].RangeStart %></td>
+											<td><%= UserFeedback[i].RangeEnd %></td>
+											<td><%= UserFeedback[i].Unit %></td>
+											<td><%= UserFeedback[i].Status %></td>
+											<td><%= UserFeedback[i].CreatedDate %></td>
+											<td><%= UserFeedback[i].CreatedBy %></td>
+											<td>
+												<a href="/UserFeedback?id=<%= UserFeedback[i]._id %>" title="Edit"><i class="lni lni-pencil-alt"></i></a> 
+												<a href="#" onclick="Delete('<%= UserFeedback[i]._id %>')"><i class="lni lni-trash"></i></a>
+											</td>
+										</tr>															
+										<% j++}
+										%>
+									</tbody>
+							<table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--end page wrapper -->
+		<!--start overlay-->
+		<div class="overlay toggle-icon"></div>
+		<!--end overlay-->
+		<!--Start Back To Top Button--> <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+		<!--End Back To Top Button-->
+		<footer class="page-footer">
+			<p class="mb-0">Copyright © 2023. All right reserved.</p>
+		</footer>
+	</div>
+	<!--end wrapper-->
+
+	<!-- Bootstrap JS -->
+	<script src="/dashboard_assets/js/bootstrap.bundle.min.js"></script>
+	<!--plugins-->
+	<script src="/dashboard_assets/js/jquery.min.js"></script>
+	<script src="/dashboard_assets/plugins/simplebar/js/simplebar.min.js"></script>
+	<script src="/dashboard_assets/plugins/metismenu/js/metisMenu.min.js"></script>
+	<script src="/dashboard_assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+
+	<script src="/dashboard_assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+	<script src="/dashboard_assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+	<!--app JS-->
+	<script>
+		$(document).ready(function() {
+			$('#example').DataTable();
+		  } );
+	</script>
+	<script>
+		$(document).ready(function() {
+			var table = $('#example2').DataTable( {
+				lengthChange: false,
+				buttons: [ 'copy', 'excel', 'pdf', 'print']
+			} );
+		 
+			table.buttons().container()
+				.appendTo( '#example2_wrapper .col-md-6:eq(0)' );
+		} );
+
+	</script>
+	<script src="/dashboard_assets/js/app.js"></script>
+
+
+    
+</body>
+
+</html>
